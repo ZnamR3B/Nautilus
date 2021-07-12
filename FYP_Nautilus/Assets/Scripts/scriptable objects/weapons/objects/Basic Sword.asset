@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a936390bd7935444af2967b0cb73d0c, type: 3}
+  m_Name: Basic Sword
+  m_EditorClassIdentifier: 
+  weaponName: Basic Sword
+  extraHP: 15
+  extraPP: 0
+  extraPD: 5
+  extraAP: 0
+  extraAD: 0
+  extraSpd: 0
+  type: 0
+  basicSkill: {fileID: 11400000, guid: 5ab6ced9dbf5ca94d80792c2ec6e4a93, type: 2}
+  skills: []
