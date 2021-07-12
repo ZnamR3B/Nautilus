@@ -16,7 +16,7 @@ MonoBehaviour:
   skillElement: 0
   prio: 0
   range: 2
-  power: 50
+  power: 80
   accuracy: 100
   type: 1
   moveZ: 0
@@ -25,5 +25,7 @@ MonoBehaviour:
   hate: 0
   description: 
   targetType: 0
+  extraAcc: 0
+  extraPower: 0
   enemySkillTargetType: 0
   angerReduce: 30

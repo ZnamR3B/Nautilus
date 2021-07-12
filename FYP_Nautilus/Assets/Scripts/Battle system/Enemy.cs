@@ -82,7 +82,21 @@ public class Enemy : BattleEntity
 
     public override IEnumerator action(Action action)
     {
-        yield return StartCoroutine(action.skill.use(this));
+        if(canMove)
+        {
+            onBeforeAction(this);
+            yield return StartCoroutine(action.skill.use(this));
+            onAfterAction(this);
+        }
+        else
+        {
+            yield return StartCoroutine(GlobalMethods.printDialog(battleSystem.dialog, "But cannot move...", GlobalVariables.duration_dialog));
+        }
     }
 
+    public override IEnumerator defeat()
+    {
+        yield return StartCoroutine(GlobalMethods.printDialog(battleSystem.dialog, "it is defeated", GlobalVariables.duration_dialog));
+        battleSystem.endBattle(true);
+    }
 }

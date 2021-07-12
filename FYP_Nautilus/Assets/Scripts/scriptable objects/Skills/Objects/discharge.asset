@@ -21,7 +21,9 @@ MonoBehaviour:
   type: 1
   moveZ: 1
   moveY: 0
-  o2: 10
+  o2: 50
   hate: 10
   description: Cannon basic skill
   targetType: 0
+  extraAcc: 0
+  extraPower: 0

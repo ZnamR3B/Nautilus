@@ -6,8 +6,11 @@ public class GlobalCoroutiner : MonoBehaviour
 {
     public static GlobalCoroutiner instance;
 
-    void Start()
+    void Awake()
     {
-        GlobalCoroutiner.instance = this;
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(gameObject);
     }
 }

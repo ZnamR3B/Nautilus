@@ -21,7 +21,9 @@ MonoBehaviour:
   type: 0
   moveZ: 3
   moveY: -1
-  o2: 10
+  o2: 15
   hate: 10
   description: Twins' basic attack
   targetType: 0
+  extraAcc: 0
+  extraPower: 0

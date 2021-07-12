@@ -4,15 +4,9 @@ using UnityEngine;
 
 public class SwitchManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public AllyCharacter returnCharacter()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        AllyCharacter result = null;
+        return result;
     }
 }

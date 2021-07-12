@@ -19,6 +19,7 @@ MonoBehaviour:
   extraAP: 0
   extraAD: 0
   extraSpd: 0
+  extraO2: 6000
   type: 0
   basicSkill: {fileID: 11400000, guid: 5ab6ced9dbf5ca94d80792c2ec6e4a93, type: 2}
   skills: []

@@ -107,14 +107,17 @@ MonoBehaviour:
   PD_buff: 0
   AP_buff: 0
   AD_buff: 0
-  Spd_buff: 2
+  Spd_buff: 0
   evadeRate: 0
   extraEvadeRate: 0
-  skills: []
   index: 0
+  extraRange: 0
+  extraMoveZ: 0
+  canMove: 0
   O2: 0
   maxO2: 0
   O2bar: {fileID: 0}
   onField: 0
+  skills: []
   hate: 0
   heightIndex: 0

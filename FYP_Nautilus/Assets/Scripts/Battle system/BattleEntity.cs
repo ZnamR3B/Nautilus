@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-public class BattleEntity : MonoBehaviour, I_OnRoundStart
+public class BattleEntity : MonoBehaviour, I_OnRoundStart, I_OnRoundEnd
 {
     public BattleSystem battleSystem;
     public Slider HPbar;
@@ -36,9 +36,20 @@ public class BattleEntity : MonoBehaviour, I_OnRoundStart
 
     public int index; //-1 is ally bench char, -2 is boss enemy
 
+    public int extraRange;
+    public int extraMoveZ;
+
+    public bool canMove = true;
     public void onRoundStart()
     {
-        //round start init
+        //round start init        
+        extraRange = 0;
+        extraMoveZ = 0;        
+    }
+    
+    public void onRoundEnd()
+    {
+        canMove = true;
     }
 
     public virtual IEnumerator action(Action action)
@@ -57,24 +68,34 @@ public class BattleEntity : MonoBehaviour, I_OnRoundStart
 
     public virtual IEnumerator defeat()
     {
-        yield return StartCoroutine(GlobalMethods.printDialog(battleSystem.dialog, "it is defeated", 1.5f));        
-        if (index == -2)
+        for (int i = 0; i < battleSystem.actions.Count; i++)
         {
-            battleSystem.endBattle(true);
-        }
-        else
-        {
-            for (int i = 0; i < battleSystem.actions.Count; i++)
+            if (battleSystem.actions[i].user == this)
             {
-                if (battleSystem.actions[i].user == this)
-                {
-                    Action newAction = battleSystem.actions[i];
-                    newAction.cancelled = true;
-                    battleSystem.actions[i] = newAction;
-                }
+                Action newAction = battleSystem.actions[i];
+                newAction.cancelled = true;
+                battleSystem.actions[i] = newAction;
             }
         }
-        
-        
+        return null;
+
+
+    }
+
+    protected void onBeforeAction(BattleEntity user)
+    {
+        I_OnBeforeAction[] i_OnBeforeActions = user.GetComponents<I_OnBeforeAction>();
+        foreach (I_OnBeforeAction s in i_OnBeforeActions)
+        {
+            s.onBeforeAction(this);
+        }
+    }
+    protected void onAfterAction(BattleEntity user)
+    {
+        I_OnAfterAction[] i_OnAfterActions = user.GetComponents<I_OnAfterAction>();
+        foreach (I_OnAfterAction s in i_OnAfterActions)
+        {
+            s.onAtferAction(this);
+        }
     }
 }

@@ -72,8 +72,12 @@ public class BattleSystem : MonoBehaviour
         fieldCamera.SetActive(false);
         //get player characters manager
         charManager = GameObject.FindGameObjectWithTag("PlayerInfo").GetComponent<PlayerCharacterManager>();
-        itemManager = charManager.gameObject.GetComponent<ItemManager>();
+        itemManager = charManager.gameObject.GetComponent<ItemManager>();        
+        //laneCount & distCount (member in team and dist between enemy
+        laneCount = Mathf.Min(3, charManager.teamMembers.Length);
+        distCount = Random.Range(monster.minDist, monster.maxDist + 1);
         //generate background field
+        enemyHolder.localPosition = new Vector3(0, 4.5f, (distCount - 3) * 3 + 1);
         if (monster.fieldType < fieldPrefabs.Length)
         {
             Instantiate(fieldPrefabs[monster.fieldType], backgroundHolder);
@@ -83,10 +87,9 @@ public class BattleSystem : MonoBehaviour
         enemy.index = -2;
         enemy.battleSystem = this;
         enemy.HPbar = enemyHPBar;
+        enemy.canMove = true;
         allBattleUnits.Add(enemy);        
-        //laneCount & distCount (member in team and dist between enemy
-        laneCount = Mathf.Min(3, charManager.teamMembers.Length);
-        distCount = Random.Range(monster.minDist, monster.maxDist + 1);
+        
         //init arrays to store battle data
         fieldUnits = new GameObject[laneCount * distCount];
         allyChar = new AllyCharacter[charManager.teamMembers.Length];
@@ -132,13 +135,14 @@ public class BattleSystem : MonoBehaviour
         }
         //init variables
         roundCount = 0;
-        yield return StartCoroutine(GlobalMethods.printDialog(dialog, enemy.entityName + " appeared!!!", 1.5f));
+        yield return StartCoroutine(GlobalMethods.printDialog(dialog, enemy.entityName + " appeared!!!", GlobalVariables.duration_dialog));
         battleRoundStart();
     }
 
     public void battleRoundStart()
     {
         //round start
+        actions.Clear();
         roundCount++;
         currentCharIndex = 0;
         BattleEntity[] entities = allBattleUnits.ToArray();
@@ -282,12 +286,21 @@ public class BattleSystem : MonoBehaviour
 
     public IEnumerator startAction()
     {
-        sortBattleAction(actions.ToArray(), 0, actions.Count - 1);
+        Action[] actionList = actions.ToArray();
+        sortBattleAction(actionList, 0, actions.Count - 1);
+        actions.Clear();
+        foreach(Action action in actionList)
+        {
+            actions.Add(action);
+        }
         foreach(Action action in actions)
         {
-            yield return StartCoroutine(GlobalMethods.printDialog(dialog, action.user.entityName + " used " + action.skill.skillName, 1.5f));
-            yield return StartCoroutine(action.user.action(action));
-            yield return new WaitForSeconds(1f);
+            if(!action.cancelled)
+            {
+                yield return StartCoroutine(GlobalMethods.printDialog(dialog, action.user.entityName + " used " + action.skill.skillName, GlobalVariables.duration_dialog));
+                yield return StartCoroutine(action.user.action(action));
+                yield return new WaitForSeconds(.25f);
+            }
         }
         battleRoundStart();        
     }
@@ -411,6 +424,7 @@ public class BattleSystem : MonoBehaviour
 
     public void endBattle(bool win)
     {
+        StopAllCoroutines();
         if(win)
         {
             //pass data of HP and o2 left

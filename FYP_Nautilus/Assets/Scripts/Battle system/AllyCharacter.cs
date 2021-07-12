@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using DG.Tweening;
 public class AllyCharacter : BattleEntity
 {
+    public bool alive;
     public int O2;
     public int maxO2;
     public Slider O2bar;
@@ -27,15 +28,33 @@ public class AllyCharacter : BattleEntity
         O2 = ch.remainO2 + ch.equippedWeapon.extraO2;
         maxO2 = ch.base_O2 + ch.equippedWeapon.extraO2;
         hate = 0;
+        alive = true;
         //init skills
         skills = new Skill[ch.equippedWeapon.skills.Length + 1];
         skills[0] = ch.equippedWeapon.basicSkill;
+        canMove = true;
         if(ch.equippedWeapon.skills.Length > 0)
         {
             for (int i = 0; i < ch.equippedWeapon.skills.Length; i++)
             {
                 skills[i + 1] = ch.equippedWeapon.skills[i];
             }
+        }
+        //give passive skill
+        switch(ch.equippedWeapon.type)
+        {
+            case WeaponType.Sword:
+                gameObject.AddComponent<Passive_Sword>();
+                break;
+            case WeaponType.Axe:
+                gameObject.AddComponent<Passive_Axe>();
+                break;
+            case WeaponType.Cannon:
+                gameObject.AddComponent<Passive_Cannon>();
+                break;
+            case WeaponType.Twins:
+                gameObject.AddComponent<Passive_Twins>();
+                break;
         }
         //referencing
         battleSystem = bs;
@@ -48,15 +67,18 @@ public class AllyCharacter : BattleEntity
 
     public override IEnumerator action(Action action)
     {
-        if(action.skill != null)
+        //trigger onBeforeAction action
+        onBeforeAction(this);
+        if(action.skill != null && canMove)
         {            
             Skill skill = action.skill;
             //check dist between on-lane enemy or boss enemy
             int moveZ = skill.moveZ;
+            int remainDist = 0;
             if (skill.moveZ > battleSystem.distCount - index % battleSystem.distCount - 1)
             {
                 //need return back            
-                int remainDist = skill.moveZ - (battleSystem.distCount - index % battleSystem.distCount - 1);
+                remainDist = skill.moveZ - (battleSystem.distCount - index % battleSystem.distCount - 1);
                 moveZ -= remainDist;
             }
             //move vertical and move forward
@@ -76,39 +98,68 @@ public class AllyCharacter : BattleEntity
             {
                 heightIndex += skill.moveY;
             }
-
-            //move
-            yield return StartCoroutine(moveTo(new Vector3(transform.position.x, transform.parent.position.y + heightIndex * 2, transform.position.z)));
-            yield return new WaitForSeconds(0.3f);
-            index += moveZ;
-            yield return StartCoroutine(moveTo(battleSystem.fieldUnits[index].transform.position + new Vector3(0, 1, 0)));
-            yield return new WaitForSeconds(0.5f);
-            //if moved but not in range, end action
-            //else attack by skill. Deal damage and do skill effects
-            if (skill.range >= battleSystem.distCount - index % battleSystem.distCount && skill.targetType == SkillTargetType.single)
+            //reduce o2
+            if(O2 - skill.o2 < 0)
             {
-                //in-range
-                skill.use(this, battleSystem.enemy);
-            }
-            else if (skill.targetType == SkillTargetType.all)
-            {
-                List<BattleEntity> targets = null;
-                foreach (BattleEntity e in battleSystem.allBattleUnits)
-                {
-                    targets.Add(e);
-                }
-                skill.use(this, targets.ToArray());
-            }
-            else if (skill.targetType == SkillTargetType.other)
-            {
-                skill.use(this, skillTarget());
+                //cant use
+                yield return StartCoroutine(GlobalMethods.printDialog(battleSystem.dialog, "Not enough Oxygen to move...!", GlobalVariables.duration_dialog));
             }
             else
             {
-                //not in range
-                yield return GlobalMethods.printDialog(battleSystem.dialog, "but not in-range...", 1f);
+                O2bar.value = (float) O2 / maxO2;
+                yield return new WaitForSeconds(GlobalVariables.duration_HPReduce);
+                //move
+                yield return StartCoroutine(moveTo(new Vector3(transform.position.x, transform.parent.position.y + heightIndex * 2, transform.position.z)));
+                yield return new WaitForSeconds(0.3f);
+                index += moveZ;
+                yield return StartCoroutine(moveTo(battleSystem.fieldUnits[index].transform.position + new Vector3(0, 1, 0)));
+                yield return new WaitForSeconds(0.5f);
+                //if moved but not in range, end action
+                //else attack by skill. Deal damage and do skill effects
+                if (skill.range + extraRange >= battleSystem.distCount - index % battleSystem.distCount && skill.targetType == SkillTargetType.single)
+                {
+                    //in-range
+                    yield return StartCoroutine(skill.use(this, battleSystem.enemy));
+                }
+                else if (skill.targetType == SkillTargetType.all)
+                {
+                    List<BattleEntity> targets = null;
+                    foreach (BattleEntity e in battleSystem.allBattleUnits)
+                    {
+                        targets.Add(e);
+                    }
+                    yield return StartCoroutine(skill.use(this, targets.ToArray()));
+                }
+                else if (skill.targetType == SkillTargetType.other)
+                {
+                    yield return StartCoroutine(skill.use(this, skillTarget()));
+                }
+                else
+                {
+                    //not in range
+                    yield return GlobalMethods.printDialog(battleSystem.dialog, "but not in-range...", GlobalVariables.duration_dialog);
+                }
+                //do end action
             }
-            //do end action
+            yield return new WaitForSeconds(.25f);
+            if(remainDist > 0)
+            {
+                if(remainDist > index % battleSystem.distCount )
+                {
+                    index = laneIndex * battleSystem.distCount;
+                }
+                else
+                {
+                    index -= remainDist;
+                }
+                yield return StartCoroutine(moveTo(battleSystem.fieldUnits[index].transform.position + new Vector3(0, 1, 0)));
+
+            }
+            onAfterAction(this);
+        }
+        else
+        {
+            yield return StartCoroutine(GlobalMethods.printDialog(battleSystem.dialog, " but cannot move...", GlobalVariables.duration_dialog));
         }
     }
 
@@ -120,8 +171,26 @@ public class AllyCharacter : BattleEntity
     public override IEnumerator defeat()
     {
         hate = 0;
-        return base.defeat();
+        alive = false;
+        int count = 0;
+        foreach(AllyCharacter ch in battleSystem.allyChar)
+        {
+            if(ch.alive)
+            {
+                count++;
+            }
+        }
+        yield return StartCoroutine(moveTo(battleSystem.characterHolder.position + new Vector3(0, 0, -10)));
+        base.defeat();
     }
 
+    public void switchWith(AllyCharacter ch)
+    {
+        ch.index = index;
+        index = -1;
+        StartCoroutine(ch.moveTo(battleSystem.fieldUnits[ch.index].transform.position + new Vector3(0, 1, 0)));
+        StartCoroutine(moveTo(battleSystem.characterHolder.position + new Vector3(0, 0, -10)));
+
+    }
 
 }

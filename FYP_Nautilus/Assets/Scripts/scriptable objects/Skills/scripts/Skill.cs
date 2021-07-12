@@ -16,7 +16,7 @@ public class Skill : ScriptableObject
     public int prio;
     public int range;
     public int power;
-    public int accuracy; // 999 to be must-hit
+    public int accuracy; // 9999 to be must-hit
     public SkillType type;
 
     public int moveZ;
@@ -87,27 +87,35 @@ public class Skill : ScriptableObject
         return 1;
     }
 
+    public int extraAcc;
+    public int extraPower;
 
 
     public IEnumerator use(AllyCharacter user, Enemy target)
     {
-        if (accuracy == 999 || Random.Range(0, 100) > accuracy - target.finalEvadeRate)
-        {
-            yield return GlobalCoroutiner.instance.StartCoroutine(GlobalMethods.printDialog(user.battleSystem.dialog, "it hits!", 1.5f));
+        //trigger action OnBeforeAttack()
+        extraAcc = 0;
+        extraPower = 0;
+
+        onBeforeAttack(user);
+
+        //hit judge
+        if (accuracy >= 999 || Random.Range(0, 100) < accuracy - target.finalEvadeRate + extraAcc) //accuracy >=999 is must-hit skill
+        {            
             //hit
-            int dmg = 0;
+            int dmg = extraPower;
             if (type == SkillType.physical)
             {
-                dmg = user.finalPP - target.finalPD;
+                dmg += user.finalPP - target.finalPD;
 
             }
             else if (type == SkillType.arts)
             {
-                dmg = user.finalAP - target.finalAD;
+                dmg += user.finalAP - target.finalAD;
             }
             else
             {
-                //effect no dmg
+                //do effect
                 yield return null;
             }
             dmg += power;
@@ -120,8 +128,8 @@ public class Skill : ScriptableObject
             }
             //yield return 
             target.HP -= dmg;
-            target.HPbar.DOValue((float)target.HP / target.max_HP, 1.5f);
-            yield return new WaitForSeconds(1.5f);
+            target.HPbar.DOValue((float)target.HP / target.max_HP, GlobalVariables.duration_HPReduce);
+            yield return new WaitForSeconds(GlobalVariables.duration_HPReduce);
             user.hate += hate;
             if (target.HP <= 0)
             {
@@ -131,7 +139,7 @@ public class Skill : ScriptableObject
         else
         {
             //missed
-            yield return GlobalCoroutiner.instance.StartCoroutine(GlobalMethods.printDialog(user.battleSystem.dialog, "it missed...", 1.5f));
+            yield return GlobalCoroutiner.instance.StartCoroutine(GlobalMethods.printDialog(user.battleSystem.dialog, "but it missed...", GlobalVariables.duration_dialog));
         }
         yield return null;
     }
@@ -146,11 +154,11 @@ public class Skill : ScriptableObject
             }
             else
             {
-                if (accuracy == 999 || Random.Range(0, 100) > accuracy - target.finalEvadeRate)
+                if (accuracy == 999 || Random.Range(0, 100) < accuracy - target.finalEvadeRate + extraAcc)
                 {
                     //GlobalMethods.printDialog(user.battleSystem.dialog, "it hits!", 1.5f);
                     //hit
-                    int dmg = 0;
+                    int dmg = extraPower;
                     if(type == SkillType.effect)
                     {
                         //effect no dmg
@@ -159,12 +167,12 @@ public class Skill : ScriptableObject
                     {
                         if (type == SkillType.physical)
                         {
-                            dmg = user.finalPP - target.finalPD;
+                            dmg += user.finalPP - target.finalPD;
 
                         }
                         else if (type == SkillType.arts)
                         {
-                            dmg = user.finalAP - target.finalAD;
+                            dmg += user.finalAP - target.finalAD;
                         }
                         dmg = Mathf.CeilToInt(dmg);
                         if (dmg <= 0)
@@ -173,12 +181,12 @@ public class Skill : ScriptableObject
                         }
                         //yield return 
                         target.HP -= dmg;
-                        target.HPbar.DOValue((float)target.HP / target.max_HP, 1.5f);
+                        target.HPbar.DOValue((float)target.HP / target.max_HP, GlobalVariables.duration_HPReduce);
+                        yield return new WaitForSeconds(GlobalVariables.duration_HPReduce);
                         user.hate += hate;
-                        yield return new WaitForSeconds(1.5f);
                         if (target.HP <= 0)
                         {
-                            target.defeat();
+                            yield return GlobalCoroutiner.instance.StartCoroutine(target.defeat());
                         }
                     }
                     
@@ -187,8 +195,9 @@ public class Skill : ScriptableObject
                 else
                 {
                     //missed
-                    yield return GlobalCoroutiner.instance.StartCoroutine(GlobalMethods.printDialog(user.battleSystem.dialog, "it missed...", 1.5f));
+                    yield return GlobalCoroutiner.instance.StartCoroutine(GlobalMethods.printDialog(user.battleSystem.dialog, "it missed...", GlobalVariables.duration_dialog));
                 }
+                onAfterAttack(user);
                 yield return null;
             }
         }
@@ -198,4 +207,27 @@ public class Skill : ScriptableObject
     {
         yield return null;
     }
+
+    protected void onBeforeAttack(BattleEntity user)
+    {
+        I_OnBeforeAttack[] scripts = user.GetComponents<I_OnBeforeAttack>();
+        foreach (I_OnBeforeAttack s in scripts)
+        {
+            s.onBeforeAttack(this);
+        }
+    }
+
+    protected void onAfterAttack(BattleEntity user)
+    {
+        I_OnAfterAttack[] scripts = user.GetComponents<I_OnAfterAttack>();
+        foreach(I_OnAfterAttack s in scripts)
+        {
+            s.onAfterAttack(user,this);                     
+        }
+    }
+
+    protected virtual IEnumerator doEffect(BattleEntity target)
+    {
+        return null;
+    }    
 }

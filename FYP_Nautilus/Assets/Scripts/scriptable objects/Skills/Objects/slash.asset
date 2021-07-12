@@ -21,7 +21,9 @@ MonoBehaviour:
   type: 0
   moveZ: 2
   moveY: -1
-  o2: 0
-  hate: 0
+  o2: 10
+  hate: 10
   description: Sword basic skill
   targetType: 0
+  extraAcc: 30
+  extraPower: 10
