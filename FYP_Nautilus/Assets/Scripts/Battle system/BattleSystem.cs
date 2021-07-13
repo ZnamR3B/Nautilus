@@ -185,6 +185,7 @@ public class BattleSystem : MonoBehaviour
                 }
             }
         }
+        charPose.gameObject.SetActive(true);
         charPose.sprite = allyChar[currentCharIndex].pose;
         commandState = true;
         openMainPanel();
@@ -322,6 +323,7 @@ public class BattleSystem : MonoBehaviour
     }
     public IEnumerator startAction()
     {
+        charPose.gameObject.SetActive(false);
         commandState = false;
         Action[] actionList = actions.ToArray();
         sortBattleAction(actionList, 0, actions.Count - 1);

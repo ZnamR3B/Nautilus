@@ -8,6 +8,7 @@ public class Potion : Item
     public int recoverHP;
     public override IEnumerator onUseInBattle(BattleEntity target)
     {
+        yield return GlobalCoroutiner.instance.StartCoroutine(GlobalMethods.printDialog(target.battleSystem.dialog, target.entityName + " used " + itemName, GlobalVariables.duration_dialog));
         yield return GlobalCoroutiner.instance.StartCoroutine(target.recover(recoverHP));
     }
 }

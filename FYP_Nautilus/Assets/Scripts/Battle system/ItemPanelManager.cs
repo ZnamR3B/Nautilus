@@ -22,8 +22,7 @@ public class ItemPanelManager : SubMenuManager
                 GameObject icon =
                     Instantiate(itemButtonPrefab, itemButtonHolder);
                 ItemButton script = icon.GetComponent<ItemButton>();
-                script.thisItem = battleSystem.itemManager.items[i];
-                script.manager = this;
+                script.initButton(battleSystem.itemManager.items[i], this);
                 icon.GetComponentInChildren<TextMeshProUGUI>().text = battleSystem.itemManager.itemCount[i].ToString();
                 icon.GetComponent<Image>().sprite = script.thisItem.icon;
             }
