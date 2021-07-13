@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c177c50c5a78a54f83e2f9d623a13ce, type: 3}
   m_Name: BasicPotion
   m_EditorClassIdentifier: 
+  icon: {fileID: 21300000, guid: 74cf619faa23354429f84aba84871699, type: 3}
   itemName: Basic Potion
   soldPrice: 20
   usable_field: 0

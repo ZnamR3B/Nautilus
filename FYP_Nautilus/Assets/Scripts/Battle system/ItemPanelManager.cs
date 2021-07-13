@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class ItemPanelManager : SubMenuManager
 {
@@ -20,7 +21,11 @@ public class ItemPanelManager : SubMenuManager
                 //instantiate item
                 GameObject icon =
                     Instantiate(itemButtonPrefab, itemButtonHolder);
-                icon.GetComponent<ItemButton>().thisItem = battleSystem.itemManager.items[i];
+                ItemButton script = icon.GetComponent<ItemButton>();
+                script.thisItem = battleSystem.itemManager.items[i];
+                script.manager = this;
+                icon.GetComponentInChildren<TextMeshProUGUI>().text = battleSystem.itemManager.itemCount[i].ToString();
+                icon.GetComponent<Image>().sprite = script.thisItem.icon;
             }
         }
     }
