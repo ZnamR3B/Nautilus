@@ -19,6 +19,7 @@ public class FieldMonster : MonoBehaviour
     {
         if(other.CompareTag("Player"))
         {
+            other.GetComponent<PlayerController>().inBattle = true;
             //triggeres
             battleSystem.gameObject.SetActive(true);
             StartCoroutine(battleSystem.battleTriggered(this));

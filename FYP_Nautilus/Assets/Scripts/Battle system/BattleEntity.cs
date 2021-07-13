@@ -79,7 +79,6 @@ public class BattleEntity : MonoBehaviour, I_OnRoundStart, I_OnRoundEnd
         }
         return null;
 
-
     }
 
     protected void onBeforeAction(BattleEntity user)

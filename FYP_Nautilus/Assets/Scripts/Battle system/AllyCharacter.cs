@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using DG.Tweening;
 public class AllyCharacter : BattleEntity
 {
+    public Character info;
     public bool alive;
     public int O2;
     public int maxO2;
@@ -172,14 +173,8 @@ public class AllyCharacter : BattleEntity
     {
         hate = 0;
         alive = false;
-        int count = 0;
-        foreach(AllyCharacter ch in battleSystem.allyChar)
-        {
-            if(ch.alive)
-            {
-                count++;
-            }
-        }
+        index = -1;
+        onField = false;
         yield return StartCoroutine(moveTo(battleSystem.characterHolder.position + new Vector3(0, 0, -10)));
         base.defeat();
     }
@@ -188,6 +183,13 @@ public class AllyCharacter : BattleEntity
     {
         ch.index = index;
         index = -1;
+        onField = false;
+        ch.onField = true;
+        int allyCharIndex_user = System.Array.IndexOf(battleSystem.allyChar, this);
+        int allyCharIndex_target = System.Array.IndexOf(battleSystem.allyChar, ch);
+        AllyCharacter temp = battleSystem.allyChar[allyCharIndex_user];
+        battleSystem.allyChar[allyCharIndex_user] = battleSystem.allyChar[allyCharIndex_target];
+        battleSystem.allyChar[allyCharIndex_target] = temp;
         StartCoroutine(ch.moveTo(battleSystem.fieldUnits[ch.index].transform.position + new Vector3(0, 1, 0)));
         StartCoroutine(moveTo(battleSystem.characterHolder.position + new Vector3(0, 0, -10)));
 

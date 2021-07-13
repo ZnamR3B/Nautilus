@@ -8,6 +8,8 @@ public struct Action
     public int prio;
     public BattleEntity user;
     public Skill skill;
+    public Item item;
+    public AllyCharacter ch;
     public bool cancelled;
     public int finalPrio { get {return prio * 1000 + user.finalSpd; } }
 }
@@ -64,9 +66,11 @@ public class BattleSystem : MonoBehaviour
     public SwitchManager switchManager;
     //battle input
     public int currentCharIndex;
+    public bool commandState;
 
     public IEnumerator battleTriggered(FieldMonster monster)
-    {        
+    {
+        commandState = false;
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
         fieldCamera.SetActive(false);
@@ -118,6 +122,7 @@ public class BattleSystem : MonoBehaviour
             script.HPbar.value = (float)script.HP / script.max_HP;
             script.O2bar = info.transform.GetChild(1).GetComponent<Slider>();
             script.O2bar.value = (float)script.O2 / script.maxO2;
+            script.info = charManager.characters[charManager.teamMembers[l]];
             allBattleUnits.Add(script);
         }
         //generate characters NOT on field initially
@@ -160,8 +165,20 @@ public class BattleSystem : MonoBehaviour
                 s.onRoundStart();
             }
         }
+        for (int i = 0; i < laneCount; i++)
+        {
+            if(!allyChar[i].alive)
+            {
+                currentCharIndex++;
+                if(currentCharIndex == laneCount)
+                {
+                    StartCoroutine(startAction());
+                }
+            }
+        }
         charPose.sprite = allyChar[currentCharIndex].pose;
-        mainPanel.SetActive(true);
+        commandState = true;
+        openMainPanel();
     }
 
     void sortBattleUnits(BattleEntity[] arr, int left, int right)
@@ -284,8 +301,16 @@ public class BattleSystem : MonoBehaviour
         skillManager.openPanel();
     }
 
+    public void openMainPanel()
+    {
+        mainPanel.SetActive(true);
+        itemPanelObject.SetActive(false);
+        switchPanelObject.SetActive(false);
+        skillPanelObject.SetActive(false);
+    }
     public IEnumerator startAction()
     {
+        commandState = false;
         Action[] actionList = actions.ToArray();
         sortBattleAction(actionList, 0, actions.Count - 1);
         actions.Clear();
@@ -293,15 +318,90 @@ public class BattleSystem : MonoBehaviour
         {
             actions.Add(action);
         }
-        foreach(Action action in actions)
+        for (int i = 0; i < actions.Count; i++) 
         {
-            if(!action.cancelled)
+            if(!actions[i].cancelled)
             {
-                yield return StartCoroutine(GlobalMethods.printDialog(dialog, action.user.entityName + " used " + action.skill.skillName, GlobalVariables.duration_dialog));
-                yield return StartCoroutine(action.user.action(action));
+                if (actions[i].skill != null)
+                {
+                    yield return StartCoroutine(GlobalMethods.printDialog(dialog, actions[i].user.entityName + " used " + actions[i].skill.skillName, GlobalVariables.duration_dialog));
+                    yield return StartCoroutine(actions[i].user.action(actions[i]));
+                }
+                else if (actions[i].item != null)
+                {
+                    //use item
+                }
+                else if(actions[i].ch != null)
+                {
+                    //switch
+                }
                 yield return new WaitForSeconds(.25f);
             }
         }
+        //round end action
+        //check any char defeated
+        bool [] stillOnLane = new bool[3];
+        int aliveCount = 0;
+        int benchCount = 0;
+        foreach(AllyCharacter ch in allyChar)
+        {
+            if (ch.alive)
+            {
+                aliveCount++;
+                if(ch.index > 0)
+                {
+                    stillOnLane[ch.laneIndex] = true;
+                }
+                else
+                {
+                    benchCount++;
+                }
+            }                            
+        }
+        Debug.Log("benchCount: " + benchCount + " aliveCount: " + aliveCount + " stillonlane[0]: " + stillOnLane[0] + "stilllane[1]" + stillOnLane[1]);
+        
+        for(int i = 0; i< laneCount; i++)
+        {
+            //if yes, replace it if possible
+            if (!stillOnLane[i])
+            {
+                if (benchCount > 0)
+                {
+                    //subs this lane with a character
+                    openSwitchPanel();
+                    switchManager.openPanel();
+                    AllyCharacter target = null;
+                    while (target == null)
+                    {
+                        //until a target is return
+                        target = switchManager.result;
+                        yield return null;
+                    }
+                    target.index = i * distCount;
+                    target.onField = true;
+                    stillOnLane[i] = true;
+                    StartCoroutine(target.moveTo(fieldUnits[target.index].transform.position + new Vector3(0, 1, 0)));
+                    switchManager.result = null;
+                    closeAllPanels();
+                    benchCount--;
+                }
+                else
+                {
+                    for(int x = i; x < laneCount; x++)
+                    {
+                        if(!stillOnLane[x])
+                        {
+                            for(int j = 0; j < distCount; j++)
+                            {
+                                Destroy(fieldUnits[x * distCount + j]);
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
         battleRoundStart();        
     }
 
@@ -422,6 +522,10 @@ public class BattleSystem : MonoBehaviour
         }
     }
 
+    public void endRound()
+    {
+
+    }
     public void endBattle(bool win)
     {
         StopAllCoroutines();

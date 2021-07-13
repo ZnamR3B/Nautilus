@@ -145,12 +145,12 @@ public class EnemySkill : Skill
             {
                 if (type == SkillType.physical)
                 {
-                    dmg = user.finalPP - target.finalPD;
+                    dmg = user.finalPP + power - target.finalPD;
 
                 }
                 else if (type == SkillType.arts)
                 {
-                    dmg = user.finalAP - target.finalAD;
+                    dmg = user.finalAP + power - target.finalAD;
                 }
                 dmg = Mathf.CeilToInt(dmg);
                 if (dmg <= 0)
