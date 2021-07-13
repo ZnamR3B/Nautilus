@@ -68,6 +68,13 @@ public class BattleSystem : MonoBehaviour
     public int currentCharIndex;
     public bool commandState;
 
+    private void Update()
+    {
+        if(Input.GetButton("Cancel"))
+        {
+            lastChar();
+        }
+    }
     public IEnumerator battleTriggered(FieldMonster monster)
     {
         commandState = false;
