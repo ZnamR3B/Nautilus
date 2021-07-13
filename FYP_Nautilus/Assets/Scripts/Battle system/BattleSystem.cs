@@ -62,7 +62,7 @@ public class BattleSystem : MonoBehaviour
     public GameObject dialog;
 
     public SkillCommandManager skillManager;
-    public ItemPanelManager ItemPanelManager;
+    public ItemPanelManager itemPanelManager;
     public SwitchManager switchManager;
     //battle input
     public int currentCharIndex;
@@ -289,7 +289,7 @@ public class BattleSystem : MonoBehaviour
         switchPanelObject.SetActive(false);
         skillPanelObject.SetActive(false);
         //script
-        skillManager.openPanel();
+        itemPanelManager.openPanel();
     }
     public void openSwitchPanel()
     {
@@ -298,9 +298,12 @@ public class BattleSystem : MonoBehaviour
         switchPanelObject.SetActive(true);
         skillPanelObject.SetActive(false);
         //script
-        skillManager.openPanel();
+        switchManager.openPanel();
     }
+    public void retreat()
+    {
 
+    }
     public void openMainPanel()
     {
         mainPanel.SetActive(true);
