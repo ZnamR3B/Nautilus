@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using DG.Tweening;
 [CreateAssetMenu(fileName = "Potion", menuName = "Items/Potions", order = 1)]
 public class Potion : Item
 {
-    public override void onUseInBattle()
+    public int recoverHP;
+    public override IEnumerator onUseInBattle(AllyCharacter target)
     {
-        
+        yield return GlobalCoroutiner.instance.StartCoroutine(target.recover(recoverHP));
     }
 }

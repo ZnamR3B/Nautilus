@@ -513,15 +513,15 @@ public class BattleSystem : MonoBehaviour
     {
         if(currentCharIndex != 0)
         {
-            foreach(Action action in actions)
+            currentCharIndex--;
+            foreach (Action action in actions)
             {
                 if(action.user == allyChar[currentCharIndex])
                 {
                     actions.Remove(action);
                     break;
                 }
-            }
-            currentCharIndex--;
+            }            
             mainPanel.SetActive(true);
             itemPanelObject.SetActive(false);
             switchPanelObject.SetActive(false);
