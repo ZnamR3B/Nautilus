@@ -337,13 +337,14 @@ public class BattleSystem : MonoBehaviour
                 else if(actions[i].ch != null)
                 {
                     //switch
+                    yield return StartCoroutine(actions[i].user.GetComponent<AllyCharacter>().switchWith(actions[i].ch));
                 }
                 yield return new WaitForSeconds(.25f);
             }
         }
         //round end action
         //check any char defeated
-        bool [] stillOnLane = new bool[3];
+        bool [] stillOnLane = new bool[laneCount];
         int aliveCount = 0;
         int benchCount = 0;
         foreach(AllyCharacter ch in allyChar)
@@ -351,7 +352,7 @@ public class BattleSystem : MonoBehaviour
             if (ch.alive)
             {
                 aliveCount++;
-                if(ch.index > 0)
+                if(ch.index >= 0)
                 {
                     stillOnLane[ch.laneIndex] = true;
                 }
@@ -404,7 +405,6 @@ public class BattleSystem : MonoBehaviour
                 }
             }
         }
-
         battleRoundStart();        
     }
 
@@ -485,7 +485,6 @@ public class BattleSystem : MonoBehaviour
             //end command stage
             //enemy choose action
             enemy.decideAction();
-            Debug.Log("enemy decide action");
             closeAllPanels();
             StartCoroutine(startAction());       
         }
@@ -525,10 +524,6 @@ public class BattleSystem : MonoBehaviour
         }
     }
 
-    public void endRound()
-    {
-
-    }
     public void endBattle(bool win)
     {
         StopAllCoroutines();

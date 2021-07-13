@@ -31,6 +31,12 @@ public class SwitchCharButton : MonoBehaviour
             action.ch = ch;
             action.cancelled = false;
             switchManager.battleSystem.actions.Add(action);
+            I_OnActionAdded[] scripts = action.user.GetComponents<I_OnActionAdded>();
+            foreach (I_OnActionAdded s in scripts)
+            {
+                s.onActionAdded(action);
+            }
+            switchManager.battleSystem.nextChar();
         }
     }
 }

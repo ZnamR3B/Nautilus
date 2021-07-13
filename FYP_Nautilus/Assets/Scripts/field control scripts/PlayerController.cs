@@ -56,8 +56,7 @@ public class PlayerController : MonoBehaviour
                 {
                     if (hitColliders[i].CompareTag("Floor"))
                     {
-                        onGround = true;
-                        Debug.Log("Floored");
+                        onGround = true;                        
                         speed = walkSpeed;
                         break;
                     }
@@ -127,7 +126,6 @@ public class PlayerController : MonoBehaviour
 
                 if (onGround && Input.GetButton("Jump") && !jumpPressing)
                 {
-                    Debug.Log("jump");
                     onGround = false;
                     rb.velocity += Vector3.up * jumpForce;
                     speed = walkSpeed / 2;

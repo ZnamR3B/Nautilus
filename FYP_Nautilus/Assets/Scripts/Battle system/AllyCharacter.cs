@@ -179,10 +179,11 @@ public class AllyCharacter : BattleEntity
         base.defeat();
     }
 
-    public void switchWith(AllyCharacter ch)
+    public IEnumerator switchWith(AllyCharacter ch)
     {
+        int tempIndex = ch.index;
         ch.index = index;
-        index = -1;
+        index = tempIndex;
         onField = false;
         ch.onField = true;
         int allyCharIndex_user = System.Array.IndexOf(battleSystem.allyChar, this);
@@ -191,8 +192,8 @@ public class AllyCharacter : BattleEntity
         battleSystem.allyChar[allyCharIndex_user] = battleSystem.allyChar[allyCharIndex_target];
         battleSystem.allyChar[allyCharIndex_target] = temp;
         StartCoroutine(ch.moveTo(battleSystem.fieldUnits[ch.index].transform.position + new Vector3(0, 1, 0)));
-        StartCoroutine(moveTo(battleSystem.characterHolder.position + new Vector3(0, 0, -10)));
-
+        StartCoroutine(moveTo(battleSystem.fieldUnits[index].transform.position + new Vector3(0, 1, 0)));
+        yield return new WaitForSeconds(.5f);
     }
 
 }
