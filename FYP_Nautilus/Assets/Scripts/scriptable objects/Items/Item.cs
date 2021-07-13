@@ -12,7 +12,7 @@ public class Item : ScriptableObject
     public bool usable_battle;
 
     public string description;
-    public virtual IEnumerator onUseInBattle(AllyCharacter target)
+    public virtual IEnumerator onUseInBattle(BattleEntity target)
     {
         return null;
     }

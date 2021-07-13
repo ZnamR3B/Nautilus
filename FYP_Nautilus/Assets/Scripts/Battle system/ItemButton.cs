@@ -16,5 +16,6 @@ public class ItemButton : MonoBehaviour
         action.skill = null;
         action.user = manager.battleSystem.allyChar[manager.battleSystem.currentCharIndex];
         manager.battleSystem.actions.Add(action);
+        manager.battleSystem.nextChar();
     }
 }

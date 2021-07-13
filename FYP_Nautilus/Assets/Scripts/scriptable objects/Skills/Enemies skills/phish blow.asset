@@ -16,7 +16,7 @@ MonoBehaviour:
   skillElement: 0
   prio: 0
   range: 2
-  power: 200
+  power: 40
   accuracy: 100
   type: 1
   moveZ: 0

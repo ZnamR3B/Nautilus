@@ -5193,6 +5193,7 @@ MonoBehaviour:
   switchManager: {fileID: 1784165217}
   currentCharIndex: 0
   commandState: 0
+  backButton: {fileID: 1458656759}
 --- !u!4 &1524052058
 Transform:
   m_ObjectHideFlags: 0

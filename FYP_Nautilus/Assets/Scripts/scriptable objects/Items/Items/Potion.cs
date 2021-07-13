@@ -6,7 +6,7 @@ using DG.Tweening;
 public class Potion : Item
 {
     public int recoverHP;
-    public override IEnumerator onUseInBattle(AllyCharacter target)
+    public override IEnumerator onUseInBattle(BattleEntity target)
     {
         yield return GlobalCoroutiner.instance.StartCoroutine(target.recover(recoverHP));
     }

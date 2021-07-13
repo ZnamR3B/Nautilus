@@ -68,6 +68,8 @@ public class BattleSystem : MonoBehaviour
     public int currentCharIndex;
     public bool commandState;
 
+    public GameObject backButton;
+
     private void Update()
     {
         if(Input.GetButton("Cancel"))
@@ -340,6 +342,7 @@ public class BattleSystem : MonoBehaviour
                 else if (actions[i].item != null)
                 {
                     //use item
+                    yield return StartCoroutine(actions[i].item.onUseInBattle(actions[i].user));
                 }
                 else if(actions[i].ch != null)
                 {
@@ -506,6 +509,7 @@ public class BattleSystem : MonoBehaviour
             skillPanelObject.SetActive(false);
             //char sprite
             charPose.sprite = allyChar[currentCharIndex].pose;
+            backButton.SetActive(true);
         }
     }
 
@@ -528,6 +532,10 @@ public class BattleSystem : MonoBehaviour
             skillPanelObject.SetActive(false);
             //char sprite
             charPose.sprite = allyChar[currentCharIndex].pose;
+            if(currentCharIndex == 0)
+            {
+                backButton.SetActive(false);
+            }
         }
     }
 
