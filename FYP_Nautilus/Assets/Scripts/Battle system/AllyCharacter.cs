@@ -178,8 +178,9 @@ public class AllyCharacter : BattleEntity
         onField = false;
         HPbar = null;
         O2bar = null;
-        
-        Destroy(battleSystem.charInfoPanelHolder.GetChild(System.Array.IndexOf(battleSystem.allyChar, this)).gameObject);
+
+        battleSystem.removeCharInfoPanel(this);
+        battleSystem.allBattleUnits.Remove(this);
         yield return StartCoroutine(moveTo(battleSystem.characterHolder.position + new Vector3(0, 0, -10)));
         base.defeat();
     }
@@ -206,12 +207,15 @@ public class AllyCharacter : BattleEntity
         else//only this character on field
         {
             //set info panel
-            Destroy(battleSystem.charInfoPanelHolder.GetChild(allyCharIndex_user).gameObject);
+            battleSystem.removeCharInfoPanel(this);
             battleSystem.addCharInfoPanel(battleSystem.allyChar[allyCharIndex_target], laneIndex);
 
             //swap position
             StartCoroutine(ch.moveTo(battleSystem.fieldUnits[ch.index].transform.position + new Vector3(0, 1, 0)));
             StartCoroutine(moveTo(battleSystem.characterHolder.position + new Vector3(0, 0, -10)));
+
+            //battle system setting
+            battleSystem.allBattleUnits.Remove(this);
         }
         //swap onField boolean value
         bool tempBool = onField;
