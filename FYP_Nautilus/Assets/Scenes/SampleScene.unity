@@ -2772,7 +2772,8 @@ MonoBehaviour:
   characterName: Ramiel
   icon: {fileID: 21300000, guid: f9753fbeca688bf4db970171b969b4e7, type: 3}
   pose: {fileID: 21300000, guid: 8af71f829c1cf1946a7a780d653700d8, type: 3}
-  battleAvatar: {fileID: 0}
+  battleAvatar: {fileID: 7795151089462497592, guid: 56529b04739b7f04aa241d218dc7f112,
+    type: 3}
   remainHP: 78
   remainO2: 0
   base_O2: 0
@@ -3060,7 +3061,8 @@ MonoBehaviour:
   characterName: Breeze
   icon: {fileID: 21300000, guid: 13ed4ef74fdce2042bff0cbff8ac7f35, type: 3}
   pose: {fileID: 21300000, guid: 747597887be13264692d68a05212e8fe, type: 3}
-  battleAvatar: {fileID: 0}
+  battleAvatar: {fileID: 7795151089462497592, guid: 333aaacb48c013a4a86b5596a232c3db,
+    type: 3}
   remainHP: 70
   remainO2: 0
   base_O2: 0
@@ -3317,7 +3319,7 @@ MonoBehaviour:
   - {fileID: 681877316}
   - {fileID: 1233393263}
   memberJoined: 0101010101010101
-  teamMembers: 000000000100000002000000
+  teamMembers: 00000000010000000200000005000000
 --- !u!4 &821339958
 Transform:
   m_ObjectHideFlags: 0
@@ -3389,7 +3391,8 @@ MonoBehaviour:
   characterName: Irina
   icon: {fileID: 21300000, guid: 5de541beffd0c6a42928c136dcadd428, type: 3}
   pose: {fileID: 21300000, guid: 3716279aa1659ff49b9d03fcbf505873, type: 3}
-  battleAvatar: {fileID: 0}
+  battleAvatar: {fileID: 7795151089462497592, guid: 9aac9204fd68e48499ceb1d47fd101cd,
+    type: 3}
   remainHP: 95
   remainO2: 0
   base_O2: 0
@@ -4375,7 +4378,8 @@ MonoBehaviour:
   characterName: Kyla
   icon: {fileID: 21300000, guid: 3ae5cf8a6861ac840be2490fd10f4dc1, type: 3}
   pose: {fileID: 21300000, guid: b4a932b144bbced40b1b36387155e283, type: 3}
-  battleAvatar: {fileID: 0}
+  battleAvatar: {fileID: 7795151089462497592, guid: 18f541432a2bdd54dab8929fa35f9205,
+    type: 3}
   remainHP: 70
   remainO2: 0
   base_O2: 0
@@ -4842,7 +4846,8 @@ MonoBehaviour:
   characterName: Lapis
   icon: {fileID: 21300000, guid: c4f454741f2b1ec4d8fc0b1768262d4a, type: 3}
   pose: {fileID: 21300000, guid: ab9a0cc286c70794195e7d38307c9306, type: 3}
-  battleAvatar: {fileID: 0}
+  battleAvatar: {fileID: 7795151089462497592, guid: ce2d3d729c037d14c925fcd47ce0afe8,
+    type: 3}
   remainHP: 100
   remainO2: 0
   base_O2: 0

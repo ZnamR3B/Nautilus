@@ -389,7 +389,7 @@ public class BattleSystem : MonoBehaviour
                     target.index = i * distCount;
                     target.onField = true;
                     stillOnLane[i] = true;
-
+                    addCharInfoPanel(target, target.laneIndex);
                     StartCoroutine(target.moveTo(fieldUnits[target.index].transform.position + new Vector3(0, 1, 0)));
                     switchManager.result = null;
                     closeAllPanels();
@@ -486,7 +486,7 @@ public class BattleSystem : MonoBehaviour
 
     public void nextChar()
     {
-        if(currentCharIndex == allyChar.Length - 1)
+        if(currentCharIndex == Mathf.Min(allyChar.Length , 3) - 1)
         {
             //end command stage
             //enemy choose action
@@ -542,8 +542,7 @@ public class BattleSystem : MonoBehaviour
         script.HPbar = info.transform.GetChild(0).GetComponent<Slider>();
         script.HPbar.value = (float)script.HP / script.max_HP;
         script.O2bar = info.transform.GetChild(1).GetComponent<Slider>();
-        script.O2bar.value = (float)script.O2 / script.maxO2;
-        script.info = charManager.characters[charManager.teamMembers[laneIndex]];
+        script.O2bar.value = (float)script.O2 / script.maxO2;        
         info.transform.SetSiblingIndex(laneIndex);
     }
     public void endBattle(bool win)
