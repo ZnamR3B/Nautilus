@@ -175,22 +175,45 @@ public class AllyCharacter : BattleEntity
         alive = false;
         index = -1;
         onField = false;
+        HPbar = null;
+        O2bar = null;
+        
+        Destroy(battleSystem.charInfoPanelHolder.GetChild(System.Array.IndexOf(battleSystem.allyChar, this)).gameObject);
         yield return StartCoroutine(moveTo(battleSystem.characterHolder.position + new Vector3(0, 0, -10)));
         base.defeat();
     }
 
     public IEnumerator switchWith(AllyCharacter ch)
     {
+        //swap index
         int tempIndex = ch.index;
         ch.index = index;
         index = tempIndex;
-        onField = false;
-        ch.onField = true;
+        //get its array index of script in battle system's allyChar[]
         int allyCharIndex_user = System.Array.IndexOf(battleSystem.allyChar, this);
         int allyCharIndex_target = System.Array.IndexOf(battleSystem.allyChar, ch);
+        //set info panel
+        if (ch.onField && onField) //both onField
+        {            
+            battleSystem.charInfoPanelHolder.GetChild(allyCharIndex_user).SetSiblingIndex(allyCharIndex_target);
+            battleSystem.charInfoPanelHolder.GetChild(allyCharIndex_target).SetSiblingIndex(allyCharIndex_user);
+        }
+        else
+        {
+            //only this character on field
+            Destroy(battleSystem.charInfoPanelHolder.GetChild(allyCharIndex_user).gameObject);
+            battleSystem.addCharInfoPanel(battleSystem.allyChar[allyCharIndex_target], laneIndex);
+        }
+        //swap onField boolean value
+        bool tempBool = onField;
+        onField = ch.onField;
+        ch.onField = tempBool;
+
+        //swap script position in array
         AllyCharacter temp = battleSystem.allyChar[allyCharIndex_user];
         battleSystem.allyChar[allyCharIndex_user] = battleSystem.allyChar[allyCharIndex_target];
         battleSystem.allyChar[allyCharIndex_target] = temp;
+        //swap position
         StartCoroutine(ch.moveTo(battleSystem.fieldUnits[ch.index].transform.position + new Vector3(0, 1, 0)));
         StartCoroutine(moveTo(battleSystem.fieldUnits[index].transform.position + new Vector3(0, 1, 0)));
         yield return new WaitForSeconds(.5f);

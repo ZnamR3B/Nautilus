@@ -7,7 +7,7 @@ public class SubMenuManager : MonoBehaviour
     public BattleSystem battleSystem;
     private void Update()
     {
-        if (Input.GetButton("Cancel"))
+        if (Input.GetButtonDown("Cancel"))
         {
             toMain();
         }

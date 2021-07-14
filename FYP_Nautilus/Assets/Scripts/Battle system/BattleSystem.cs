@@ -72,7 +72,7 @@ public class BattleSystem : MonoBehaviour
 
     private void Update()
     {
-        if(Input.GetButton("Cancel"))
+        if(Input.GetButtonDown("Cancel") && mainPanel.activeSelf)
         {
             lastChar();
         }
@@ -124,14 +124,7 @@ public class BattleSystem : MonoBehaviour
             script.initEntity(charManager.characters[charManager.teamMembers[l]], this, l, true);
             allyChar[l] = script;
             //init UI info
-            GameObject info =
-                Instantiate(charInfoPanelPrefab, charInfoPanelHolder);
-            info.GetComponentInChildren<TextMeshProUGUI>().text = script.entityName;
-            script.HPbar = info.transform.GetChild(0).GetComponent<Slider>();
-            script.HPbar.value = (float)script.HP / script.max_HP;
-            script.O2bar = info.transform.GetChild(1).GetComponent<Slider>();
-            script.O2bar.value = (float)script.O2 / script.maxO2;
-            script.info = charManager.characters[charManager.teamMembers[l]];
+            addCharInfoPanel(script, l);
             allBattleUnits.Add(script);
         }
         //generate characters NOT on field initially
@@ -396,6 +389,7 @@ public class BattleSystem : MonoBehaviour
                     target.index = i * distCount;
                     target.onField = true;
                     stillOnLane[i] = true;
+
                     StartCoroutine(target.moveTo(fieldUnits[target.index].transform.position + new Vector3(0, 1, 0)));
                     switchManager.result = null;
                     closeAllPanels();
@@ -540,7 +534,18 @@ public class BattleSystem : MonoBehaviour
             }
         }
     }
-
+    public void addCharInfoPanel(AllyCharacter script, int laneIndex)
+    {
+        GameObject info =
+                Instantiate(charInfoPanelPrefab, charInfoPanelHolder);
+        info.GetComponentInChildren<TextMeshProUGUI>().text = script.entityName;
+        script.HPbar = info.transform.GetChild(0).GetComponent<Slider>();
+        script.HPbar.value = (float)script.HP / script.max_HP;
+        script.O2bar = info.transform.GetChild(1).GetComponent<Slider>();
+        script.O2bar.value = (float)script.O2 / script.maxO2;
+        script.info = charManager.characters[charManager.teamMembers[laneIndex]];
+        info.transform.SetSiblingIndex(laneIndex);
+    }
     public void endBattle(bool win)
     {
         StopAllCoroutines();
