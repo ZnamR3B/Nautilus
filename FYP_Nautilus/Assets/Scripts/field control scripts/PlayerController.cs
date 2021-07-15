@@ -2,14 +2,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
+    public TextMeshProUGUI depthText;
+
     public bool underwater = false;
     public bool inBattle = false;
     public float speed;
-    float walkSpeed = 8;
-    float swimSpeed = 5;
+    float walkSpeed = 10;
+    float swimSpeed = 10;
+
+    float rbDrag_swim = Mathf.Infinity;
+    float rbDrag_walk = 0;
     public float jumpForce;
 
     public CameraController cameraController;
@@ -105,6 +112,8 @@ public class PlayerController : MonoBehaviour
                 //move player upward
                 Vector3 upwardMovement = new Vector3(0, up, 0) * (Time.deltaTime * speed);
                 transform.Translate(upwardMovement, Space.World);
+                //set depth text
+                depthText.text = "Current Depth: " + Mathf.Abs(transform.position.y);
             }
             else
             {
@@ -160,7 +169,7 @@ public class PlayerController : MonoBehaviour
         {
             underwater = true;
             anim.SetBool("Underwater", true);
-            rb.drag = 10;
+            rb.drag = rbDrag_swim;
             speed = swimSpeed;
             onGround = false;
         }
@@ -171,7 +180,7 @@ public class PlayerController : MonoBehaviour
         if (other.CompareTag("Water"))
         {
             //underwater = false;            
-            rb.drag = 0.1f;            
+            rb.drag = rbDrag_walk;            
         }
         if(other.CompareTag("Floor"))
         {
