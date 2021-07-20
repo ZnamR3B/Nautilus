@@ -110,8 +110,8 @@ MonoBehaviour:
   HPbar: {fileID: 0}
   entityName: Spheish
   pose: {fileID: 0}
-  HP: 1000
-  max_HP: 1000
+  HP: 600
+  max_HP: 600
   PP: 90
   PD: 45
   AP: 120

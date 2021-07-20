@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using DG.Tweening;
 public class BattleEntity : MonoBehaviour, I_OnRoundStart, I_OnRoundEnd
 {
     public BattleSystem battleSystem;
@@ -80,6 +79,7 @@ public class BattleEntity : MonoBehaviour, I_OnRoundStart, I_OnRoundEnd
         }
         return null;
 
+
     }
 
     protected void onBeforeAction(BattleEntity user)
@@ -97,16 +97,5 @@ public class BattleEntity : MonoBehaviour, I_OnRoundStart, I_OnRoundEnd
         {
             s.onAtferAction(this);
         }
-    }
-
-    public IEnumerator recover(int amount)
-    {
-        HP += amount;
-        if (HP > max_HP)
-        {
-            HP = max_HP;
-        }
-        HPbar.DOValue((float)HP/ max_HP, GlobalVariables.duration_HPReduce);
-        yield return new WaitForSeconds(GlobalVariables.duration_HPReduce);
     }
 }

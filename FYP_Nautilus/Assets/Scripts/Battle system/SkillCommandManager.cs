@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-public class SkillCommandManager : SubMenuManager
+public class SkillCommandManager : MonoBehaviour
 {
+    public BattleSystem battleSystem;
     public GameObject skillButtonPrefab;
     public Transform skillButtonHolder;
     public void openPanel()
     {
         //reset skill list
-        foreach(Transform obj in skillButtonHolder)
+        foreach(Transform obj in skillButtonHolder.transform)
         {
             Destroy(obj.gameObject);
         }
@@ -23,6 +24,4 @@ public class SkillCommandManager : SubMenuManager
             script.GetComponentInChildren<TextMeshProUGUI>().text = skill.skillName;
         }
     }
-
-   
 }

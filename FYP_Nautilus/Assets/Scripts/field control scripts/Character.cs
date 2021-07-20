@@ -8,7 +8,7 @@ public class Character : MonoBehaviour
     public string characterName;
 
     //public Material skin;
-    public Sprite icon;
+    
     public Sprite pose;
 
     public GameObject battleAvatar;

@@ -62,12 +62,14 @@ public class EnemySkill : Skill
                 target = user.battleSystem.allyChar[Random.Range(0, user.battleSystem.laneCount)];
             }
             if (range + user.extraRange >=  user.battleSystem.distCount - target.index % user.battleSystem.distCount )
-            {             
+            {
+                Debug.Log("original target is in range");
                 //if in range
                 yield return GlobalCoroutiner.instance.StartCoroutine(dmg(user, target));
             }
             else
             {
+                Debug.Log("original target is not in range");
                 // this will have the following problem:
                 //if before characters move and it decide its action, it will have chance that character is out-of-ranged which originally dont
 
@@ -99,6 +101,7 @@ public class EnemySkill : Skill
                         }
                     }
                 }
+                Debug.Log("new target is: " + target);
                 if (target != null)
                 {
                     yield return GlobalCoroutiner.instance.StartCoroutine(dmg(user,target));
@@ -142,12 +145,12 @@ public class EnemySkill : Skill
             {
                 if (type == SkillType.physical)
                 {
-                    dmg = user.finalPP + power - target.finalPD;
+                    dmg = user.finalPP - target.finalPD;
 
                 }
                 else if (type == SkillType.arts)
                 {
-                    dmg = user.finalAP + power - target.finalAD;
+                    dmg = user.finalAP - target.finalAD;
                 }
                 dmg = Mathf.CeilToInt(dmg);
                 if (dmg <= 0)

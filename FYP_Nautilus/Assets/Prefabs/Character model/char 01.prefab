@@ -113,9 +113,7 @@ MonoBehaviour:
   index: 0
   extraRange: 0
   extraMoveZ: 0
-  canMove: 1
-  info: {fileID: 0}
-  alive: 0
+  canMove: 0
   O2: 0
   maxO2: 0
   O2bar: {fileID: 0}

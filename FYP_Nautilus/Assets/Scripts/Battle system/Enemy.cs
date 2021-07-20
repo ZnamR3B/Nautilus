@@ -27,8 +27,6 @@ public class Enemy : BattleEntity
             action.user = this;
             action.skill = angerSkills[Random.Range(0, angerSkills.Length)];
             action.prio = action.skill.prio;
-            action.ch = null;
-            action.item = null;
             battleSystem.actions.Add(action);
         }
         else
@@ -67,8 +65,6 @@ public class Enemy : BattleEntity
             }
             Action action;
             action.cancelled = false;
-            action.ch = null;
-            action.item = null;
             action.user = this;
             if (inRangeSkills.Count > 0)
             {   
