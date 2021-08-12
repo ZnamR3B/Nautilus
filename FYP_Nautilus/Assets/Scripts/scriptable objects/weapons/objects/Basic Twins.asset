@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a936390bd7935444af2967b0cb73d0c, type: 3}
   m_Name: Basic Twins
   m_EditorClassIdentifier: 
+  id: 3
   weaponName: Basic Twins
+  description: Basic Twins Weapon
+  buyPrice: 20
+  sellPrice: 5
   extraHP: 0
   extraPP: 2
   extraPD: 0

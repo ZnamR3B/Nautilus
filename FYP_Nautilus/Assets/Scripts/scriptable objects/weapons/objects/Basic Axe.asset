@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a936390bd7935444af2967b0cb73d0c, type: 3}
   m_Name: Basic Axe
   m_EditorClassIdentifier: 
+  id: 0
   weaponName: Basic Axe
+  description: Basic Axe Weapon
+  buyPrice: 20
+  sellPrice: 5
   extraHP: 10
   extraPP: 0
   extraPD: 0

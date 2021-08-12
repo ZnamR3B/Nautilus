@@ -4,19 +4,27 @@ using UnityEngine;
 
 public class Item : ScriptableObject
 {
+    public Sprite icon;
+    public int id;
     public string itemName;
-    public int soldPrice;
-
+    public int sellPrice;
+    public int buyPrice;
     public bool usable_field;
+    public bool toTarget;
     public bool usable_battle;
 
-    public virtual void onUseInBattle()
+    public string description;
+    public virtual IEnumerator onUseInBattle(BattleEntity target)
     {
-
+        return null;
     }
 
-    public virtual void onUseInField()
+    public virtual IEnumerator onUseInField()
     {
-
+        return null;
+    }
+    public virtual IEnumerator onUseInField(int charIndex)
+    {
+        return null;
     }
 }

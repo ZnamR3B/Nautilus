@@ -8,6 +8,8 @@ public struct Action
     public int prio;
     public BattleEntity user;
     public Skill skill;
+    public Item item;
+    public AllyCharacter ch;
     public bool cancelled;
     public int finalPrio { get {return prio * 1000 + user.finalSpd; } }
 }
@@ -60,13 +62,24 @@ public class BattleSystem : MonoBehaviour
     public GameObject dialog;
 
     public SkillCommandManager skillManager;
-    public ItemPanelManager ItemPanelManager;
+    public ItemPanelManager itemPanelManager;
     public SwitchManager switchManager;
     //battle input
     public int currentCharIndex;
+    public bool commandState;
 
+    public GameObject backButton;
+
+    private void Update()
+    {
+        if(Input.GetButtonDown("Cancel") && mainPanel.activeSelf)
+        {
+            lastChar();
+        }
+    }
     public IEnumerator battleTriggered(FieldMonster monster)
-    {        
+    {
+        commandState = false;
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
         fieldCamera.SetActive(false);
@@ -111,13 +124,7 @@ public class BattleSystem : MonoBehaviour
             script.initEntity(charManager.characters[charManager.teamMembers[l]], this, l, true);
             allyChar[l] = script;
             //init UI info
-            GameObject info =
-                Instantiate(charInfoPanelPrefab, charInfoPanelHolder);
-            info.GetComponentInChildren<TextMeshProUGUI>().text = script.entityName;
-            script.HPbar = info.transform.GetChild(0).GetComponent<Slider>();
-            script.HPbar.value = (float)script.HP / script.max_HP;
-            script.O2bar = info.transform.GetChild(1).GetComponent<Slider>();
-            script.O2bar.value = (float)script.O2 / script.maxO2;
+            addCharInfoPanel(script, l);
             allBattleUnits.Add(script);
         }
         //generate characters NOT on field initially
@@ -160,8 +167,27 @@ public class BattleSystem : MonoBehaviour
                 s.onRoundStart();
             }
         }
+        //until currentIndex points to an alive character
+        for (int i = 0; i < laneCount; i++)
+        {
+            Debug.Log("character: " + allyChar[i].entityName + " " + allyChar[i].alive);
+            if(!allyChar[i].alive)
+            {
+                currentCharIndex++;
+                if(currentCharIndex == laneCount)
+                {
+                    StartCoroutine(startAction());
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+        charPose.gameObject.SetActive(true);
         charPose.sprite = allyChar[currentCharIndex].pose;
-        mainPanel.SetActive(true);
+        commandState = true;
+        openMainPanel();
     }
 
     void sortBattleUnits(BattleEntity[] arr, int left, int right)
@@ -272,7 +298,7 @@ public class BattleSystem : MonoBehaviour
         switchPanelObject.SetActive(false);
         skillPanelObject.SetActive(false);
         //script
-        skillManager.openPanel();
+        itemPanelManager.openPanel();
     }
     public void openSwitchPanel()
     {
@@ -281,11 +307,23 @@ public class BattleSystem : MonoBehaviour
         switchPanelObject.SetActive(true);
         skillPanelObject.SetActive(false);
         //script
-        skillManager.openPanel();
+        switchManager.openPanel();
     }
+    public void retreat()
+    {
 
+    }
+    public void openMainPanel()
+    {
+        mainPanel.SetActive(true);
+        itemPanelObject.SetActive(false);
+        switchPanelObject.SetActive(false);
+        skillPanelObject.SetActive(false);
+    }
     public IEnumerator startAction()
     {
+        charPose.gameObject.SetActive(false);
+        commandState = false;
         Action[] actionList = actions.ToArray();
         sortBattleAction(actionList, 0, actions.Count - 1);
         actions.Clear();
@@ -293,13 +331,102 @@ public class BattleSystem : MonoBehaviour
         {
             actions.Add(action);
         }
-        foreach(Action action in actions)
+        for (int i = 0; i < actions.Count; i++) 
         {
-            if(!action.cancelled)
+            if(!actions[i].cancelled)
             {
-                yield return StartCoroutine(GlobalMethods.printDialog(dialog, action.user.entityName + " used " + action.skill.skillName, GlobalVariables.duration_dialog));
-                yield return StartCoroutine(action.user.action(action));
+                if (actions[i].skill != null)
+                {
+                    yield return StartCoroutine(GlobalMethods.printDialog(dialog, actions[i].user.entityName + " used " + actions[i].skill.skillName, GlobalVariables.duration_dialog));
+                    yield return StartCoroutine(actions[i].user.action(actions[i]));
+                }
+                else if (actions[i].item != null)
+                {
+                    //use item
+                    yield return StartCoroutine(actions[i].item.onUseInBattle(actions[i].user));
+                }
+                else if(actions[i].ch != null)
+                {
+                    //switch
+                    yield return StartCoroutine(actions[i].user.GetComponent<AllyCharacter>().switchWith(actions[i].ch));
+                }
                 yield return new WaitForSeconds(.25f);
+            }
+        }
+        //round end action
+        //check any char defeated
+        bool [] stillOnLane = new bool[laneCount];
+        int aliveCount = 0;
+        int benchCount = 0;
+        foreach(AllyCharacter ch in allyChar)
+        {
+            if (ch.alive)
+            {
+                aliveCount++;
+                if(ch.index >= 0)
+                {
+                    stillOnLane[ch.laneIndex] = true;
+                }
+                else
+                {
+                    benchCount++;
+                }
+            }                            
+        }
+        Debug.Log("benchCount: " + benchCount + " aliveCount: " + aliveCount + " stillonlane[0]: " + stillOnLane[0] + "stilllane[1]" + stillOnLane[1]);
+        //check need subsitute-in or not
+        for(int i = 0; i< laneCount; i++)
+        {
+            //if yes, replace it if possible
+            if (!stillOnLane[i])
+            {
+                if (benchCount > 0)
+                {
+                    //subs this lane with a character
+                    openSwitchPanel();
+                    switchManager.openPanel();
+                    AllyCharacter target = null;
+                    while (target == null)
+                    {
+                        //until a target is return
+                        target = switchManager.result;
+                        yield return null;
+                    }
+                    //battle system change
+                    allBattleUnits.Remove(allyChar[i]);
+                    allBattleUnits.Add(target);
+                    //set index
+                    target.index = i * distCount;
+                    target.onField = true;
+                    stillOnLane[i] = true;
+                    //swap char
+                    //swap allyChar order
+                    int swapTargetIndex = System.Array.IndexOf(allyChar, target);
+                    AllyCharacter temp = allyChar[i];
+                    allyChar[i] = allyChar[swapTargetIndex];
+                    allyChar[swapTargetIndex] = temp;
+                    addCharInfoPanel(target, target.laneIndex);
+                    StartCoroutine(target.moveTo(fieldUnits[target.index].transform.position + new Vector3(0, 1, 0)));
+
+                    //done
+                    switchManager.result = null;
+                    closeAllPanels();
+                    benchCount--;
+                }
+                else
+                {
+                    for(int x = i; x < laneCount; x++)
+                    {
+                        if(!stillOnLane[x])
+                        {
+                            for(int j = 0; j < distCount; j++)
+                            {
+                                Destroy(fieldUnits[x * distCount + j]);
+                            }
+                        }
+                    }
+                    break;
+                }
             }
         }
         battleRoundStart();        
@@ -377,12 +504,11 @@ public class BattleSystem : MonoBehaviour
 
     public void nextChar()
     {
-        if(currentCharIndex == allyChar.Length - 1)
+        if(currentCharIndex == Mathf.Min(allyChar.Length , 3) - 1)
         {
             //end command stage
             //enemy choose action
             enemy.decideAction();
-            Debug.Log("enemy decide action");
             closeAllPanels();
             StartCoroutine(startAction());       
         }
@@ -390,13 +516,21 @@ public class BattleSystem : MonoBehaviour
         {
             //go next character
             currentCharIndex++;
-            //open main panel
-            mainPanel.SetActive(true);
-            itemPanelObject.SetActive(false);
-            switchPanelObject.SetActive(false);
-            skillPanelObject.SetActive(false);
-            //char sprite
-            charPose.sprite = allyChar[currentCharIndex].pose;
+            if(allyChar[currentCharIndex].alive)
+            {
+                //open main panel
+                mainPanel.SetActive(true);
+                itemPanelObject.SetActive(false);
+                switchPanelObject.SetActive(false);
+                skillPanelObject.SetActive(false);
+                //char sprite
+                charPose.sprite = allyChar[currentCharIndex].pose;
+                backButton.SetActive(true);
+            }
+            else
+            {
+                nextChar();
+            }
         }
     }
 
@@ -404,24 +538,49 @@ public class BattleSystem : MonoBehaviour
     {
         if(currentCharIndex != 0)
         {
-            foreach(Action action in actions)
+            currentCharIndex--;
+            foreach (Action action in actions)
             {
                 if(action.user == allyChar[currentCharIndex])
                 {
                     actions.Remove(action);
                     break;
                 }
-            }
-            currentCharIndex--;
+            }            
             mainPanel.SetActive(true);
             itemPanelObject.SetActive(false);
             switchPanelObject.SetActive(false);
             skillPanelObject.SetActive(false);
             //char sprite
             charPose.sprite = allyChar[currentCharIndex].pose;
+            if(currentCharIndex == 0)
+            {
+                backButton.SetActive(false);
+            }
         }
     }
+    public void addCharInfoPanel(AllyCharacter script, int laneIndex)
+    {
+        GameObject info =
+                Instantiate(charInfoPanelPrefab, charInfoPanelHolder);
+        info.GetComponentInChildren<TextMeshProUGUI>().text = script.entityName;
+        script.HPbar = info.transform.GetChild(0).GetComponent<Slider>();
+        script.HPbar.value = (float)script.HP / script.max_HP;
+        script.O2bar = info.transform.GetChild(1).GetComponent<Slider>();
+        script.O2bar.value = (float)script.O2 / script.maxO2;        
+        info.transform.SetSiblingIndex(laneIndex);
+    }
 
+    public void removeCharInfoPanel(AllyCharacter script)
+    {
+        foreach(Transform panel in charInfoPanelHolder)
+        {
+            if(panel.GetComponentInChildren<TextMeshProUGUI>().text == script.entityName)
+            {
+                Destroy(panel.gameObject);
+            }
+        }
+    }
     public void endBattle(bool win)
     {
         StopAllCoroutines();

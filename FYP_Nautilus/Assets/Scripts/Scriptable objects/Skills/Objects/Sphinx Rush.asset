@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69ead08843ee03c4a80fcf452f5f45ba, type: 3}
+  m_Name: Sphinx Rush
+  m_EditorClassIdentifier: 
+  skillName: Sphinx Rush
+  skillElement: 4
+  prio: 0
+  range: 1
+  power: 150
+  accuracy: 90
+  type: 0
+  moveZ: 2
+  moveY: 1
+  o2: 50
+  hate: 20
+  description: deal great damage
+  targetType: 0
+  extraAcc: 0
+  extraPower: 0

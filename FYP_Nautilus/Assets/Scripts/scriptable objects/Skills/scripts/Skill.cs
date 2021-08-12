@@ -26,17 +26,17 @@ public class Skill : ScriptableObject
     public int hate;
     public string description;
     public SkillTargetType targetType;
-    public float checkElementMultiply(Element element, Enemy target)
+    public float checkElementMultiply(Enemy target)
     {
         if (skillElement == Element.flare)
         {
                 //skill is flare
-                if (target.element == Element.wind)
+                if (target.element == Element.thunder)
                 {
                     //not effective
                     return 0.5f;
                 }
-                if (target.element == Element.thunder)
+                if (target.element == Element.wind)
                 {
                     //effective
                     return 1.5f;
@@ -45,12 +45,12 @@ public class Skill : ScriptableObject
         else if (skillElement == Element.earth)
         {
             //skill is earth
-            if (target.element == Element.thunder)
+            if (target.element == Element.wind)
             {
                 //not effective
                 return 0.5f;
             }
-            if (target.element == Element.wind)
+            if (target.element == Element.thunder)
             {
                 //effective
                 return 1.5f;
@@ -59,12 +59,12 @@ public class Skill : ScriptableObject
         else if (skillElement == Element.thunder)
         {
             //skill is thunder
-            if (target.element == Element.flare)
+            if (target.element == Element.earth)
             {
                 //not effective
                 return 0.5f;
             }
-            if (target.element == Element.earth)
+            if (target.element == Element.flare)
             {
                 //effective
                 return 1.5f;
@@ -73,12 +73,12 @@ public class Skill : ScriptableObject
         else if (skillElement == Element.wind)
         {
             //skill is wind
-            if (target.element == Element.earth)
+            if (target.element == Element.flare)
             {
                 //not effective
                 return 0.5f;
             }
-            if (target.element == Element.flare)
+            if (target.element == Element.earth)
             {
                 //effective
                 return 1.5f;
@@ -119,7 +119,7 @@ public class Skill : ScriptableObject
                 yield return null;
             }
             dmg += power;
-            float elementEffect = checkElementMultiply(skillElement, target);
+            float elementEffect = checkElementMultiply(target);
 
             dmg = Mathf.CeilToInt(dmg * elementEffect);
             if (dmg <= 0)

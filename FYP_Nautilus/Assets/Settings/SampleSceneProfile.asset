@@ -16,15 +16,15 @@ MonoBehaviour:
   m_AdvancedMode: 0
   threshold:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 5.3
     min: 0
   intensity:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 1.2
     min: 0
   scatter:
-    m_OverrideState: 0
-    m_Value: 0.7
+    m_OverrideState: 1
+    m_Value: 0.585
     min: 0
     max: 1
   clamp:
@@ -33,7 +33,7 @@ MonoBehaviour:
     min: 0
   tint:
     m_OverrideState: 1
-    m_Value: {r: 0.65278006, g: 0.6367924, b: 1, a: 1}
+    m_Value: {r: 0, g: 0.12286804, b: 0.9716981, a: 1}
     hdr: 0
     showAlpha: 0
     showEyeDropper: 1
@@ -118,16 +118,16 @@ MonoBehaviour:
     m_Value: 0
   focusDistance:
     m_OverrideState: 1
-    m_Value: 2
+    m_Value: 2.5
     min: 0.1
   aperture:
     m_OverrideState: 0
-    m_Value: 7
+    m_Value: 6.2
     min: 1
     max: 32
   focalLength:
     m_OverrideState: 0
-    m_Value: 49
+    m_Value: 48
     min: 1
     max: 300
   bladeCount:
@@ -217,7 +217,7 @@ MonoBehaviour:
   m_AdvancedMode: 0
   intensity:
     m_OverrideState: 1
-    m_Value: 0.425
+    m_Value: 0
     min: -1
     max: 1
   xMultiplier:
